@@ -17,11 +17,12 @@ if __name__ == "__main__":
     # Assign variables from command line
     support_threshold = args.support
     lift_threshold = args.lift
-    f_dir = parser.directory
+    f_dir = args.directory[0]
     
     # Initialize Spark
     sc = SparkContext(appName="Assignment1 - Conditions")
     spark = SparkSession.builder.appName("Assignment1 - Conditions").getOrCreate()
+    print(sc.uiWebUrl)
 
     # Read file
     file = spark.read.option('header','true').csv(f_dir)
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     frequent_items_set = set(frequent_items.map(lambda item: item[0]).collect()) 
     
     # Compare original file size to processed RDD
-    print(f'Number of records in original dataframe: {file.rdd.count()}')
+    print(f'\nNumber of records in original dataframe: {file.rdd.count()}')
     print(f'Number of records after removing duplicate diagnosis: {patient_rdd.count()}')
     
     # APRIORI ALGORITHM
@@ -69,7 +70,7 @@ if __name__ == "__main__":
                 .sortBy(lambda item: -item[1]) # sorts from most frequent to least
                 )
 
-    print("10 most frequent pairs (k = 2 sets)")
+    print("\n10 most frequent pairs (k = 2 sets)")
     most_frequent_pairs = frequent_pairs.take(10)
     print(most_frequent_pairs)
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
                     .sortBy(lambda item: -item[1])
                     )
 
-    print("10 most frequent triplets (k = 3 sets)")
+    print("\n10 most frequent triplets (k = 3 sets)")
     most_frequent_triplets = frequent_triplets.take(10)
     print(most_frequent_triplets)
 
@@ -101,7 +102,7 @@ if __name__ == "__main__":
 
     total_triplets = sum(frequent_triplets.map(lambda item: item[1]).collect())
 
-    print(f'Total single items: {total_singles}')
+    print(f'\nTotal single items: {total_singles}')
     print(f'Total pairs: {total_pairs}')
     print(f'Total triplets: {total_triplets}')
     
@@ -162,6 +163,8 @@ if __name__ == "__main__":
     
     # Save to files
     # With codes
+    print('Saving rules to file...')
+    
     with open('XY_rules_with_codes.txt', 'w') as f:
         f.write(f"{'X':<15} {'->':<5} {'Y':<15}\t{'Std Lift':<20}\t{'Lift':<20}\t{'Confidence':<20}\t{'Interest':<20}\n")
         for rule in XY_rules:
@@ -214,6 +217,9 @@ if __name__ == "__main__":
     XYZ_rules = XYZ_results_filtered.collect()
 
     print(XYZ_results_filtered.show(10))
+    
+    print('Saving rules to file...')
+    
     with open('XYZ_rules_with_codes.txt', 'w') as f:
         f.write(f"{'X, Y':<40} {'->':<5} {'Z':<15}\t{'Std Lift':<20}\t{'Lift':<20}\t{'Confidence':<20}\t{'Interest':<20}\n")
         for rule in XYZ_rules:
