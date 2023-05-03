@@ -2,6 +2,9 @@
 *.gz
 *.bz2
 .html
+186268/
+491884/
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
